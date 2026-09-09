@@ -44,22 +44,22 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 		/// <summary>
 		/// The SCB-200 terminates every command and acknowledgement with a carriage return
 		/// </summary>
-		private const string CommsDelimiter = "\r";
+		private const string commsDelimiter = "\r";
 
 		/// <summary>
 		/// Number of aspect ratio presets defined by the API (A1-A9 and A0)
 		/// </summary>
-		private const uint AspectRatioPresetCount = 10;
+		private const uint aspectRatioPresetCount = 10;
 
 		/// <summary>
 		/// Lowest preset number that may be stored to.  A1-A5 are fixed ratios; A6-A9 and A0 are user definable.
 		/// </summary>
-		private const uint FirstStorableAspectRatioPreset = 6;
+		private const uint firstStorableAspectRatioPreset = 6;
 
 		/// <summary>
 		/// SCB-200 error codes, per Appendix A of the instruction book
 		/// </summary>
-		private static readonly Dictionary<int, string> ErrorMessages = new Dictionary<int, string>
+		private static readonly Dictionary<int, string> errorMessages = new Dictionary<int, string>
 		{
 			{ 13, "Command Timed Out" },
 			{ 14, "Busy Calibrating" },
@@ -333,7 +333,7 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 			}
 
 			// The SCB-200 API is ASCII with a carriage return delimiter
-			commsGather = new CommunicationGather(this.comms, CommsDelimiter);
+			commsGather = new CommunicationGather(this.comms, commsDelimiter);
 			commsGather.LineReceived += Handle_LineReceived;
 		}
 
@@ -417,7 +417,7 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 			if (string.IsNullOrEmpty(text)) return;
 
 			this.LogVerbose("Tx: {command}", text);
-			comms.SendText(text + CommsDelimiter);
+			comms.SendText(text + commsDelimiter);
 		}
 
 		private static string GetSetModeToken(eScb200SetMode mode)
@@ -440,9 +440,9 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 		/// <returns>the token "A1"-"A9" or "A0", or null when the preset is out of range</returns>
 		private static string GetAspectRatioToken(uint preset)
 		{
-			if (preset < 1 || preset > AspectRatioPresetCount) return null;
+			if (preset < 1 || preset > aspectRatioPresetCount) return null;
 
-			return preset == AspectRatioPresetCount ? "A0" : "A" + preset;
+			return preset == aspectRatioPresetCount ? "A0" : "A" + preset;
 		}
 
 		/// <summary>
@@ -455,7 +455,7 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 			if (string.IsNullOrEmpty(token) || token.Length != 2 || token[0] != 'A') return 0;
 			if (!uint.TryParse(token.Substring(1), out uint digit)) return 0;
 
-			return digit == 0 ? AspectRatioPresetCount : digit;
+			return digit == 0 ? aspectRatioPresetCount : digit;
 		}
 
 		#endregion
@@ -598,7 +598,7 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 			if (token == null)
 			{
 				this.LogWarning("Unable to recall aspect ratio preset {preset}, valid presets are 1-{count}",
-					preset, AspectRatioPresetCount);
+					preset, aspectRatioPresetCount);
 				return;
 			}
 
@@ -612,10 +612,10 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 		public void StoreAspectRatio(uint preset)
 		{
 			var token = GetAspectRatioToken(preset);
-			if (token == null || preset < FirstStorableAspectRatioPreset)
+			if (token == null || preset < firstStorableAspectRatioPreset)
 			{
 				this.LogWarning("Unable to store aspect ratio preset {preset}, only presets {first}-{count} are user definable",
-					preset, FirstStorableAspectRatioPreset, AspectRatioPresetCount);
+					preset, firstStorableAspectRatioPreset, aspectRatioPresetCount);
 				return;
 			}
 
@@ -891,7 +891,7 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 			}
 
 			lastErrorCode = code;
-			lastErrorMessage = ErrorMessages.TryGetValue(code, out string message) ? message : "Unknown Error";
+			lastErrorMessage = errorMessages.TryGetValue(code, out string message) ? message : "Unknown Error";
 
 			this.LogWarning("SCB-200 reported error {code}: {message}", code, lastErrorMessage);
 
