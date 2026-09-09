@@ -4,11 +4,11 @@
     <InformationalVersion>$(Version)</InformationalVersion>
     <Authors>PepperDash Technology</Authors>
     <Company>PepperDash Technology</Company>
-    <Product>PepperDash Essentials Plugin Template</Product>
-    <Copyright>Copyright © 2025</Copyright>
-    <RepositoryUrl>https://github.com/PepperDash/EssentialsPluginTemplate.git</RepositoryUrl>
+    <Product>PepperDash Essentials Da-Lite SCB-200 Plugin</Product>
+    <Copyright>Copyright © 2026</Copyright>
+    <RepositoryUrl>https://github.com/PepperDash/epi-dalite-scb200.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Crestron; 4series</PackageTags>
+    <PackageTags>Crestron; 4series; Da-Lite; SCB-200; screen</PackageTags>
     <PackageOutputPath>..\output</PackageOutputPath>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
