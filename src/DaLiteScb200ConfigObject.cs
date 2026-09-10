@@ -136,5 +136,25 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 		/// </remarks>
 		[JsonProperty("screenLiftType")]
 		public string ScreenLiftType { get; set; }
+
+		/// <summary>
+		/// When true, this screen does NOT automatically lower when its assigned display powers on (warms up).
+		/// Manual Raise/Lower/Stop still work, and the power-off auto-raise is unaffected.
+		/// </summary>
+		/// <remarks>
+		/// Mirrors <see cref="PepperDash.Essentials.Devices.Common.Shades.ScreenLiftControllerConfigProperties.DisableAutoLowerOnPowerOn"/>.
+		/// </remarks>
+		[JsonProperty("disableAutoLowerOnPowerOn")]
+		public bool DisableAutoLowerOnPowerOn { get; set; }
+
+		/// <summary>
+		/// When true, this screen does NOT automatically raise when its assigned display powers off (cools down).
+		/// Manual Raise/Lower/Stop still work, and the power-on auto-lower is unaffected.
+		/// </summary>
+		/// <remarks>
+		/// Mirrors <see cref="PepperDash.Essentials.Devices.Common.Shades.ScreenLiftControllerConfigProperties.DisableAutoRaiseOnPowerOff"/>.
+		/// </remarks>
+		[JsonProperty("disableAutoRaiseOnPowerOff")]
+		public bool DisableAutoRaiseOnPowerOff { get; set; }
 	}
 }

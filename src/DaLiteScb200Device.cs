@@ -11,6 +11,7 @@ using PepperDash.Essentials.Core.Bridges;
 using PepperDash.Essentials.Core.DeviceTypeInterfaces;
 using PepperDash.Essentials.Core.Queues;
 using PepperDash.Essentials.Core.Shades;
+using PepperDash.Essentials.Devices.Common.Displays;
 
 namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 {
@@ -86,6 +87,14 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 		private readonly GenericQueue receiveQueue;
 		private readonly System.Timers.Timer movingPollTimer;
 		private readonly object movingPollLock = new object();
+		private readonly bool disableAutoLowerOnPowerOn;
+		private readonly bool disableAutoRaiseOnPowerOff;
+
+		/// <summary>
+		/// The display this screen is associated with, resolved from <see cref="DisplayDeviceKey"/> during
+		/// <see cref="CustomActivate"/> so automatic raise/lower can follow its warming/cooling feedback
+		/// </summary>
+		private DisplayBase displayDevice;
 
 		private eScb200RelayState relayState;
 		private eScb200CalibrationState calibrationState;
@@ -308,6 +317,9 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 				? eScreenLiftControlType.lift
 				: eScreenLiftControlType.screen;
 
+			disableAutoLowerOnPowerOn = config.DisableAutoLowerOnPowerOn;
+			disableAutoRaiseOnPowerOff = config.DisableAutoRaiseOnPowerOff;
+
 			movingPollTimer = new System.Timers.Timer(config.MovingPollTimeMs > 0 ? config.MovingPollTimeMs : 1000)
 			{
 				AutoReset = true
@@ -369,6 +381,72 @@ namespace PepperDash.Essentials.Plugin.DaLite.Scb200
 
 			FirmwareVersionFeedback = new StringFeedback("firmwareVersion", () => firmwareVersion);
 			ErrorMessageFeedback = new StringFeedback("errorMessage", () => lastErrorMessage);
+		}
+
+		/// <summary>
+		/// Resolves the associated display and wires automatic raise/lower to its warming/cooling feedback
+		/// </summary>
+		/// <remarks>
+		/// Mirrors <see cref="PepperDash.Essentials.Devices.Common.Shades.ScreenLiftController.CustomActivate"/>:
+		/// the display may not exist or may not be a <see cref="DisplayBase"/>, in which case automatic
+		/// control is simply unavailable and manual Raise/Lower/Stop are unaffected.
+		/// </remarks>
+		protected override bool CustomActivate()
+		{
+			displayDevice = DeviceManager.GetDeviceForKey(DisplayDeviceKey) as DisplayBase;
+
+			if (displayDevice != null)
+			{
+				displayDevice.IsWarmingUpFeedback.OutputChange += DisplayIsWarmingUpFeedback_OutputChange;
+				displayDevice.IsCoolingDownFeedback.OutputChange += DisplayIsCoolingDownFeedback_OutputChange;
+			}
+			else
+			{
+				this.LogWarning(
+					"Unable to get display device with key '{displayKey}'; automatic screen raise/lower on power on/off will not be available",
+					DisplayDeviceKey);
+			}
+
+			return base.CustomActivate();
+		}
+
+		private void DisplayIsWarmingUpFeedback_OutputChange(object sender, FeedbackEventArgs args)
+		{
+			if (!displayDevice.IsWarmingUpFeedback.BoolValue) return;
+
+			if (disableAutoLowerOnPowerOn)
+			{
+				this.LogDebug(
+					"Auto-lower on power-on disabled for {type}; leaving position unchanged (manual control only)",
+					Type);
+				return;
+			}
+
+			Lower();
+		}
+
+		private void DisplayIsCoolingDownFeedback_OutputChange(object sender, FeedbackEventArgs args)
+		{
+			if (disableAutoRaiseOnPowerOff)
+			{
+				this.LogDebug(
+					"Auto-raise on power-off disabled for {type}; leaving position unchanged (manual control only)",
+					Type);
+				return;
+			}
+
+			// A "lift" waits for cooldown to finish before retracting; a "screen" retracts as soon as
+			// cooldown begins. Matches ScreenLiftController.IsCoolingDownFeedback_OutputChange.
+			if (!displayDevice.IsCoolingDownFeedback.BoolValue && Type == eScreenLiftControlType.lift)
+			{
+				Raise();
+				return;
+			}
+			if (displayDevice.IsCoolingDownFeedback.BoolValue && Type == eScreenLiftControlType.screen)
+			{
+				Raise();
+				return;
+			}
 		}
 
 		/// <inheritdoc/>
