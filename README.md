@@ -194,3 +194,162 @@ A NuGet package is generated automatically on build. To modify the package detai
 1. `PackageId` — the name used to pull the package from NuGet once published
 2. `PackageProjectUrl` — the plugin repo URL
 3. `AssemblyTitle` — the dll file name shown on a processor when the plugin loads
+<!-- START Minimum Essentials Framework Versions -->
+### Minimum Essentials Framework Versions
+
+- 2.12.1
+<!-- END Minimum Essentials Framework Versions -->
+<!-- START Config Example -->
+### Config Example
+
+```json
+{
+    "key": "GeneratedKey",
+    "uid": 1,
+    "name": "GeneratedName",
+    "type": "DaLiteScb200",
+    "group": "Group",
+    "properties": {
+        "control": "SampleValue",
+        "deviceId": "SampleValue",
+        "pollTimeMs": 0,
+        "warningTimeoutMs": 0,
+        "errorTimeoutMs": 0,
+        "movingPollTimeMs": 0,
+        "displayDeviceKey": "SampleString",
+        "screenLiftType": "SampleString",
+        "disableAutoLowerOnPowerOn": true,
+        "disableAutoRaiseOnPowerOff": true
+    }
+}
+```
+<!-- END Config Example -->
+<!-- START Supported Types -->
+
+<!-- END Supported Types -->
+<!-- START Join Maps -->
+### Join Maps
+
+#### Digitals
+
+| Join | Type (RW) | Description |
+| --- | --- | --- |
+| 1 | R | Is Online |
+| 2 | R | Connect (Held)/Disconnect (Release) & corresponding feedback |
+| 3 | R | Raise screen (# ID SE RE UP) & is-raising feedback |
+| 4 | R | Lower screen (# ID SE RE DN) & is-lowering feedback |
+| 5 | R | Stop screen (# ID SE RE ST) & is-stopped feedback |
+| 6 | R | Screen is at the upper limit (UL) |
+| 7 | R | Screen is at the lower limit (LL) |
+| 8 | R | Screen is calibrated (# ID GE CA returns ON) |
+| 9 | R | Screen is busy calibrating (# ID GE CA returns BC) |
+| 10 | R | Rotary sensor support is on (# ID GE SE returns ON) |
+| 11 | R | Reset the SCB-200 firmware (# ID SE RS) |
+| 12 | R | Query every supported value from the SCB-200 |
+| 21 | R | Recall aspect ratio preset 1-10 (A1-A9, A0) & corresponding feedback |
+| 31 | R | Store the current position to custom aspect ratio preset 6-10 (A6-A9, A0) |
+
+#### Analogs
+
+| Join | Type (RW) | Description |
+| --- | --- | --- |
+| 1 | R | Socket Status |
+| 2 | R | Screen position scaled 0 (upper limit) to 65535 (lower limit) & corresponding feedback |
+| 3 | R | Screen position in hundredths of an inch (IN) & corresponding feedback |
+| 4 | R | Screen position in millimeters (MM) & corresponding feedback |
+| 5 | R | Raw encoder target position (TA), 0 to LL & corresponding feedback |
+| 6 | R | Upper limit encoder counter value (UL) |
+| 7 | R | Lower limit encoder counter value (LL) |
+| 8 | R | AC current drawn through the relay, in tenths of an amp (AC) |
+| 9 | R | Viewing area width in millimeters (SW) |
+| 10 | R | Viewing area height in millimeters (SH) |
+| 11 | R | Most recent SCB-200 error code, 0 when no error has been reported |
+| 12 | R | Configured RS-485 device ID (0-7) |
+
+#### Serials
+
+| Join | Type (RW) | Description |
+| --- | --- | --- |
+| 1 | R | Device Name |
+| 2 | R | SCB-200 firmware version (SV) |
+| 3 | R | Most recent SCB-200 error message, empty when no error has been reported |
+<!-- END Join Maps -->
+<!-- START Interfaces Implemented -->
+### Interfaces Implemented
+
+- IShadesOpenClosedFeedback
+- IShadesStopFeedback
+- IShadesRaiseLowerFeedback
+- IShadesPosition
+- IProjectorScreenLiftControl
+- ICommunicationMonitor
+- IOnline
+<!-- END Interfaces Implemented -->
+<!-- START Base Classes -->
+### Base Classes
+
+- JoinMapBaseAdvanced
+- EssentialsBridgeableDevice
+<!-- END Base Classes -->
+<!-- START Public Methods -->
+### Public Methods
+
+- public void SendText(string text)
+- public void Raise()
+- public void Lower()
+- public void Stop()
+- public void Open()
+- public void Close()
+- public void MoveToUpperLimit()
+- public void MoveToLowerLimit()
+- public void MoveToCurrentPosition()
+- public void SetTargetPosition(eScb200SetMode mode, uint value)
+- public void SetPosition(ushort value)
+- public void SetPositionInches(eScb200SetMode mode, double inches)
+- public void SetPositionMm(eScb200SetMode mode, uint millimeters)
+- public void RecallAspectRatio(uint preset)
+- public void StoreAspectRatio(uint preset)
+- public void Reset()
+- public void Poll()
+- public void PollPosition()
+- public void PollLimits()
+- public void QueryDeviceInfo()
+- public void PollAll()
+<!-- END Public Methods -->
+<!-- START Bool Feedbacks -->
+### Bool Feedbacks
+
+- ConnectFeedback
+- IsOnline
+- ShadeIsRaisingFeedback
+- ShadeIsLoweringFeedback
+- IsStoppedFeedback
+- ShadeIsOpenFeedback
+- ShadeIsClosedFeedback
+- IsInUpPosition
+- IsInDownPosition
+- IsCalibratedFeedback
+- IsCalibratingFeedback
+- RotarySensorEnabledFeedback
+<!-- END Bool Feedbacks -->
+<!-- START Int Feedbacks -->
+### Int Feedbacks
+
+- StatusFeedback
+- PositionFeedback
+- TargetPositionFeedback
+- PositionInchesFeedback
+- PositionMmFeedback
+- UpperLimitFeedback
+- LowerLimitFeedback
+- AcCurrentFeedback
+- ViewingAreaWidthFeedback
+- ViewingAreaHeightFeedback
+- ErrorCodeFeedback
+<!-- END Int Feedbacks -->
+<!-- START String Feedbacks -->
+### String Feedbacks
+
+- FirmwareVersionFeedback
+- ErrorMessageFeedback
+<!-- END String Feedbacks -->
